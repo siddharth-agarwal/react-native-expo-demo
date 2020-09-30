@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "medsoftsys_rn_bbaa",
+    "slug": "medsoftsys_rn_bbaa",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "backgroundColor": "#000000"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "sdkVersion": "39.0.0"
+  }
+}
