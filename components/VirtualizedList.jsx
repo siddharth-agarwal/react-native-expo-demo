@@ -2,26 +2,26 @@ import React from 'react';
 import { SafeAreaView, VirtualizedList, StyleSheet, Text, View } from 'react-native';
 import Constants from 'expo-constants';
 
-// TODO: add field linking `user_id` to vehicle `id` field
+// TODO: add field linking `user_key` to vehicle `key` field
 // note: this is a temp JSON for debugging purposes
 const DATA= [
   {
-    id: 1,
+    key: 1,
     vehicle: '2016 Audi A4'
   },
   {
-    id: 2,
+    key: 2,
     vehicle: '2019 BMW 325i'
   },
   {
-    id: 3,
+    key: 3,
     vehicle: '2017 VW GTI'
   }
 ];
 
 const getItem = (data, index) => {
   return {
-    id: DATA[index].id,
+    key: DATA[index].key,
     name: DATA[index].name,
     vehicle: DATA[index].vehicle
   }
@@ -46,7 +46,7 @@ const VirtualizedListExample = () => {
       <VirtualizedList
         data={DATA}
         initialNumToRender={4}
-        renderItem={({ item }) => <Item title={item.id} subheader={item.vehicle} />}
+        renderItem={({ item }) => <Item title={item.key} subheader={item.vehicle} />}
         keyExtractor={item => item.key}
         getItemCount={getItemCount}
         getItem={getItem}
@@ -58,14 +58,13 @@ const VirtualizedListExample = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: Constants.statusBarHeight,
+    marginTop: 10
   },
   item: {
     backgroundColor: '#c9e3cd',
     height: 80,
     justifyContent: 'center',
     marginVertical: 5,
-    marginHorizontal: 5,
     padding: 20,
   },
   title: {

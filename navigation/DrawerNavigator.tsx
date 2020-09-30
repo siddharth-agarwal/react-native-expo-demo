@@ -1,11 +1,28 @@
 import * as React from 'react';
-import { View, TextInput, ActivityIndicator, StyleSheet, Image } from 'react-native';
-import { useTheme, ParamListBase } from '@react-navigation/native';
+import {
+  View,
+  TextInput,
+  ActivityIndicator,
+  StyleSheet,
+  Image,
+  Text,
+} from "react-native";
+
+import {
+  useTheme,
+  ParamListBase,
+} from "@react-navigation/native";
+
 import {
   createStackNavigator,
   HeaderBackButton,
   StackScreenProps,
 } from '@react-navigation/stack';
+
+import {
+  createDrawerNavigator,
+} from '@react-navigation/drawer';
+
 import Button from 'react-native-button';
 
 import VehicleList from '../screens/VehicleList';
@@ -73,19 +90,36 @@ const SignInScreen = () => {
   );
 };
 
-const LoggedInStack = createStackNavigator();
-
-const LoggedInScreen = () => {
+const UserProfile = () => {
   const { signOut } = React.useContext(AuthContext);
 
   return (
-    <LoggedInStack.Navigator>
-      <LoggedInStack.Screen
+    <View style={styles.content}>
+      <Text style={styles.profile}>
+        Welcome to your user profile.
+      </Text>
+      <Text style={styles.profile}>
+        This screen will display details which pertain to the user who is currently logged in.
+      </Text>
+      <Button mode="contained" onPress={signOut} style={styles.button}>
+        Sign Out
+      </Button>
+    </View>
+  )
+}
+
+const NavDrawer = createDrawerNavigator();
+
+const UserLoggedInScreen = () => {
+  return (
+    <NavDrawer.Navigator>
+      <NavDrawer.Screen
         name="VehicleList"
         component={VehicleList}
-        options={{ headerTitle: 'Vehicle List' }}
+        options={{ title: 'Vehicle List' }}
       />
-  </LoggedInStack.Navigator>
+      <NavDrawer.Screen name="User Profile" component={UserProfile}/>
+  </NavDrawer.Navigator>
   );
 };
 
@@ -182,9 +216,9 @@ export default function SimpleStackScreen({
           />
         ) : (
           <SimpleStack.Screen
-            name="LoggedInScreen"
-            options={{ title: 'LoggedInScreen' }}
-            component={LoggedInScreen}
+            name="UserLoggedInScreen"
+            options={{ title: 'UserLoggedInScreen' }}
+            component={UserLoggedInScreen}
           />
         )}
       </SimpleStack.Navigator>
@@ -195,9 +229,11 @@ export default function SimpleStackScreen({
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    padding: 16,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  list: {
+    flex: 1,
   },
   input: {
     width: 250,
@@ -215,11 +251,12 @@ const styles = StyleSheet.create({
     margin: 8,
   },
   logo: {
-    width: 140,
-    height: 140,
+    width: 240,
+    height: 240,
   },
-  loginContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
+  profile: {
+    flex: 1,
+    // alignItems: 'center',
+    padding: 10
+  }
 });

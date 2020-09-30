@@ -8,10 +8,10 @@ export default function VehicleList() {
   // render vehicle list for user once logged in
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Signed in successfully 🎉</Text>
-
+      <Text style={styles.title}>User Vehicle List:</Text>
       <VirtualizedList></VirtualizedList>
-
+      <Text style={styles.text}>Signed in successfully 🎉</Text>
+      <Text style={styles.text}>Try using the navigation bar on the left to move around the app.</Text>
     </View>
   );
 }
@@ -19,6 +19,7 @@ export default function VehicleList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
   },
   title: {
     fontSize: 20,
@@ -33,4 +34,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 8,
   },
+  header: {
+    textAlign: 'left',
+    margin: 8,
+    fontSize: 18,
+    fontWeight: 'bold',
+    padding: 10
+  }
 });
