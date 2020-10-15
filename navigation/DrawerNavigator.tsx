@@ -1,11 +1,10 @@
-import * as React from 'react';
+import React from 'react';
 import {
   View,
   TextInput,
   ActivityIndicator,
   StyleSheet,
   Image,
-  Text,
 } from "react-native";
 
 import {
@@ -19,13 +18,11 @@ import {
   StackScreenProps,
 } from '@react-navigation/stack';
 
-import {
-  createDrawerNavigator,
-} from '@react-navigation/drawer';
+import { Button } from 'react-native-elements';
 
-import Button from 'react-native-button';
-
-import VehicleList from '../screens/VehicleList';
+import axios from 'axios';
+import { MonoText } from '../components/StyledText';
+import UserProfile from '../screens/UserProfile';
 
 type AuthStackParams = {
   Splash: undefined;
@@ -59,67 +56,65 @@ const SplashScreen = () => {
 };
 
 const SignInScreen = () => {
-  const { signIn } = React.useContext(AuthContext);
+  const [username, setUsername] = React.useState('jain.piyush888@gmail.com');
+  const [password, setPassword] = React.useState('1234');
+  const [token, setToken] = React.useState('xyz');
+
   const { colors } = useTheme();
 
-  return (
-    <View style={styles.content}>
-      <Image
-        style={styles.logo}
-        source={require('../assets/images/icon.png')}
-      />
-      <TextInput
-        placeholder="Username"
-        style={[
-          styles.input,
-          { backgroundColor: colors.card, color: colors.text },
-        ]}
-      />
-      <TextInput
-        placeholder="Password"
-        secureTextEntry
-        style={[
-          styles.input,
-          { backgroundColor: colors.card, color: colors.text },
-        ]}
-      />
-      <Button mode="contained" onPress={signIn} style={styles.button}>
-        Sign in
-      </Button>
-    </View>
-  );
-};
+  const authServer = () => {
+    let token = '';
+    const base = "https://geotoll-api.azurewebsites.net";
+    axios.post(base + '/api/user/login', {'email': username, 'password': password}).then((res) => {
+      let _token = res.data.token;
+      if (_token)
+        setToken(_token);
+    }).catch(e => {
+      console.log('error authenticating with remote server: ', e);
+    });
 
-const UserProfile = () => {
-  const { signOut } = React.useContext(AuthContext);
+    return token;
+  }
 
   return (
     <View style={styles.content}>
-      <Text style={styles.profile}>
-        Welcome to your user profile.
-      </Text>
-      <Text style={styles.profile}>
-        This screen will display details which pertain to the user who is currently logged in.
-      </Text>
-      <Button mode="contained" onPress={signOut} style={styles.button}>
-        Sign Out
-      </Button>
+      <TokenContext.Provider
+        value={{ username: username, password: password, token: token }}
+      >
+        <Image
+          style={styles.logo}
+          source={require("../assets/images/icon.png")}
+        />
+        <TextInput
+          placeholder="Username"
+          onChangeText={setUsername}
+          autoCapitalize="none"
+          value={username}
+          style={[
+            styles.input,
+            { backgroundColor: colors.card, color: colors.text },
+          ]}
+        />
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={[
+            styles.input,
+            { backgroundColor: colors.card, color: colors.text },
+          ]}
+        />
+        <Button
+          title="Sign In"
+          onPress={() => setToken(authServer())}
+          style={styles.button}
+        >
+          Sign in
+        </Button>
+        <MonoText>{token}</MonoText>
+      </TokenContext.Provider>
     </View>
-  )
-}
-
-const NavDrawer = createDrawerNavigator();
-
-const UserLoggedInScreen = () => {
-  return (
-    <NavDrawer.Navigator>
-      <NavDrawer.Screen
-        name="VehicleList"
-        component={VehicleList}
-        options={{ title: 'Vehicle List' }}
-      />
-      <NavDrawer.Screen name="User Profile" component={UserProfile}/>
-  </NavDrawer.Navigator>
   );
 };
 
@@ -128,7 +123,7 @@ const SimpleStack = createStackNavigator<AuthStackParams>();
 type State = {
   isLoading: boolean;
   isSignout: boolean;
-  userToken: undefined | string;
+  token: undefined | string;
 };
 
 type Action =
@@ -136,37 +131,41 @@ type Action =
   | { type: 'SIGN_IN'; token: string }
   | { type: 'SIGN_OUT' };
 
-export default function SimpleStackScreen({
-  navigation,
-}: StackScreenProps<ParamListBase>) {
+  const LoginVars = {
+    username: '',
+    password: '',
+    token: ''
+  };
 
-  const [state, dispatch] = React.useReducer<React.Reducer<State, Action>>(
-    (prevState, action) => {
+const TokenContext = React.createContext(LoginVars);
+
+export default function SimpleStackScreen({navigation,}: StackScreenProps<ParamListBase>) {
+  const [state, dispatch] = React.useReducer<React.Reducer<State, Action>>((prevState, action) => {
       switch (action.type) {
         case 'RESTORE_TOKEN':
           return {
             ...prevState,
-            userToken: action.token,
+            token: action.token,
             isLoading: false,
           };
         case 'SIGN_IN':
           return {
             ...prevState,
             isSignout: false,
-            userToken: action.token,
+            token: action.token,
           };
         case 'SIGN_OUT':
           return {
             ...prevState,
             isSignout: true,
-            userToken: undefined,
+            token: undefined,
           };
       }
     },
     {
       isLoading: true,
       isSignout: false,
-      userToken: undefined,
+      token: undefined,
     }
   );
 
@@ -188,6 +187,10 @@ export default function SimpleStackScreen({
     () => ({
       signIn: () => dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' }),
       signOut: () => dispatch({ type: 'SIGN_OUT' }),
+      signUp: async (data: any) => {
+        // TODO
+        dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' });
+      },
     }),
     []
   );
@@ -198,30 +201,33 @@ export default function SimpleStackScreen({
 
   return (
     <AuthContext.Provider value={authContext}>
-      <SimpleStack.Navigator
-        screenOptions={{
-          headerLeft: () => (
-            <HeaderBackButton onPress={() => navigation.goBack()} />
-          ),
-        }}
-      >
-        {state.userToken === undefined ? (
-          <SimpleStack.Screen
-            name="SignIn"
-            options={{
-              title: 'Sign in',
-              animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-            }}
-            component={SignInScreen}
-          />
-        ) : (
-          <SimpleStack.Screen
-            name="UserLoggedInScreen"
-            options={{ title: 'UserLoggedInScreen' }}
-            component={UserLoggedInScreen}
-          />
-        )}
-      </SimpleStack.Navigator>
+        <TokenContext.Consumer>
+          {token => (
+            <SimpleStack.Navigator
+              screenOptions={{
+                headerLeft: () => (
+                  <HeaderBackButton onPress={() => navigation.goBack()} />
+                ),
+              }}
+            >
+              {state.token === undefined ? (
+                  <SimpleStack.Screen
+                  name="SignIn"
+                  options={{
+                    title: 'Sign in',
+                    animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+                  }}
+                  component={SignInScreen}
+                  />
+                  ): (
+                  <SimpleStack.Screen
+                    name="LoggedInScreen"
+                    component={UserProfile}
+                  />
+                  )}
+            </SimpleStack.Navigator>
+          )}
+        </TokenContext.Consumer>
     </AuthContext.Provider>
   );
 }

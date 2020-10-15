@@ -6,18 +6,38 @@ import Constants from 'expo-constants';
 // note: this is a temp JSON for debugging purposes
 const DATA= [
   {
-    key: 1,
+    key: '1',
     vehicle: '2016 Audi A4'
   },
   {
-    key: 2,
+    key: '2',
     vehicle: '2019 BMW 325i'
   },
   {
-    key: 3,
+    key: '3',
     vehicle: '2017 VW GTI'
   }
 ];
+
+const RenderVehicleList = () => {
+  const { data: vehicles } = useGet({
+    path: "/api/vehicles/",
+    base,
+  });
+  return (
+    <div>
+      <h1>vehicles</h1>
+      <ul>
+        {vehicles &&
+          vehicles.map(vehicle => (
+            <ListItem key={vehicle.id} id={vehicle.id}>
+              {vehicle.title}
+            </ListItem>
+          ))}
+      </ul>
+    </div>
+  );
+};
 
 const getItem = (data, index) => {
   return {

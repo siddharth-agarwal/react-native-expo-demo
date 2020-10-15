@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "medsoftsys_rn_bbaa",
-    "slug": "medsoftsys_rn_bbaa",
+    "name": "medsoftwaresys_geotoll-react-native",
+    "slug": "medsoftwaresys_geotoll-react-native",
     "version": "0.0.1",
     "orientation": "portrait",
     "scheme": "myapp",
@@ -17,6 +17,12 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "sdkVersion": "39.0.0"
+    "sdkVersion": "39.0.0",
+    "android": {
+      "package": "com.geotoll.medsoftwaresys_geotollreactnative"
+    },
+    "ios": {
+      "bundleIdentifier": "com.geotoll.baseapp"
+    }
   }
 }
